@@ -1,26 +1,32 @@
 package com.example.exthread
 
-import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
-    val MESSAGE_COUNT:Int = 1
-    lateinit var thread:Thread
-    lateinit var handler:Handler
-    var count:Int = 0
+    lateinit var threadPlus: Thread
+    lateinit var threadSub: Thread
+    var handler: Handler? = null
+    var count: Int = 0
+    var pointY: Int = 0;
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        handler = Handler(mainLooper)
-        thread = Thread()
+
+        initThread()
         btnPlus.setOnClickListener {
             plus()
             countToZero()
@@ -30,85 +36,130 @@ class MainActivity : AppCompatActivity() {
             countToZero()
         }
 
+        //tăng giảm khi vuốt màn hình
+        layout_number.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> if (pointY == 0) {
+                    pointY = event.y.toInt()
+                    Log.d("pointY", "Click:y=$pointY")
+                }
+                MotionEvent.ACTION_MOVE -> if (event.y < pointY) {
+                    plus()
+                } else {
+                    subtract()
+                }
+                MotionEvent.ACTION_UP -> {
+                    pointY = 0
+                    Log.d("pointY", "y=$pointY")
+                    countToZero()
+                }
+            }
+            true
+        }
+
 //        btnPlus.setOnTouchListener(object : View.OnTouchListener {
-//            private var handle: Handler? = null
+//            private var mHandler: Handler? = null
 //            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
 //                when (event?.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        if (mHandler != null) return true
+//                        mHandler = Handler(mainLooper)
+//                        mAction.run()
+//                    }
 //                    MotionEvent.ACTION_UP -> {
-//                        if (handle != null) return true
-//                        handle = Handler(Looper.getMainLooper())
-//                        handle?.postDelayed(mAction, 50)
+//                        if (handler == null) return true
+//                        handler?.removeCallbacks(mAction)
+//                        handler = null
 //                    }
-//                    MotionEvent.ACTION_DOWN ->{
-//
-//                    }
-//                    MotionEvent.ACTION_CANCEL ->{
-//                        if (handle != null) return true
-//                        handle?.removeCallbacks(mAction)
-//                        handle = null
-//                    }
-//
+//                    else -> return false
 //                }
 //                return false
-//
 //            }
 //
-//            var mAction = Runnable{
-//                plus()
+//            var mAction: Runnable = object : Runnable {
+//                override fun run() {
+//                    if (handler != null) {
+//                        plus()
+//                        mHandler!!.postDelayed(this, 100)
+//                    }
+//                }
 //            }
-//
-//
-//
-//
 //        })
     }
-    fun plus(){
+
+    fun plus() {
         count = tvNumber.text.toString().toInt()
         count++
         tvNumber.text = count.toString()
-//        Thread.sleep(2000)
-//        while (count!=0){
-//            plus()
-//            Thread.sleep(10)
-//        }
+        if (count >= 100) {
+            tvNumber.setTextColor(
+                Color.rgb(
+                    Random.nextInt(0, 255),
+                    Random.nextInt(0, 255),
+                    Random.nextInt(0, 255)
+                )
+            )
+        }
     }
-    private fun subtract(){
+
+    private fun subtract() {
         count = tvNumber.text.toString().toInt()
         count--
         tvNumber.text = count.toString()
+        if (count >= 100) {
+            tvNumber.setTextColor(
+                Color.rgb(
+                    Random.nextInt(0, 255),
+                    Random.nextInt(0, 255),
+                    Random.nextInt(0, 255)
+                )
+            )
+        }
     }
 
-
-    private fun countToZero(){
-        count = tvNumber.text.toString().toInt()
-        if (count>0){
-            thread = Thread {
-                Thread.sleep(3000)
-                while (count!=0){
-                    count--
-                    handler.post {
-                        tvNumber.text = count.toString()
-                    }
-                    Thread.sleep(100)
-                }
-            }
-            if (!thread.isAlive)
-            thread.start()
-        }
-        if (count<0){
-            thread = Thread {
-                Thread.sleep(3000)
-                while (count!=0){
+    fun initThread(){
+        threadPlus = object : Thread() {
+            override fun run() {
+                sleep(2000)
+                while (count != 0) {
                     count++
-                    handler.post {
+                    handler?.post {
                         tvNumber.text = count.toString()
                     }
-                    Thread.sleep(100)
+                    sleep(100)
                 }
-                if (count==0) return@Thread
+                if (count==0){
+                    handler = null
+                    return
+                }
             }
-            if (!thread.isAlive)
-                thread.start()
+        }
+        threadSub = object : Thread() {
+            override fun run() {
+                sleep(2000)
+                while (count != 0) {
+                    count--
+                    handler?.post {
+                        tvNumber.text = count.toString()
+                    }
+                    sleep(100)
+                }
+                if (count==0){
+                    handler = null
+                    return
+                }
+            }
+        }
+    }
+
+    private fun countToZero() {
+        count = tvNumber.text.toString().toInt()
+        handler = Handler(mainLooper)
+        if (count > 0 && !threadSub.isAlive) {
+            threadSub.start()
+        }
+        if (count < 0 && !threadPlus.isAlive) {
+                threadPlus.start()
         }
 
     }
