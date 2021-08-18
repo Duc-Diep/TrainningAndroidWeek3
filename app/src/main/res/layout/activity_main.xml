@@ -21,7 +21,7 @@
             android:layout_centerInParent="true"
             android:text="0"
             android:textColor="@color/red"
-            android:textSize="30dp" />
+            android:textSize="50dp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -32,7 +32,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSub"
             android:text="-"
-            android:textSize="30dp"
+            android:textSize="40dp"
             android:layout_margin="5dp"
             android:textColor="@color/red"
             android:background="@color/teal_200"
@@ -43,7 +43,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnPlus"
             android:text="+"
-            android:textSize="30dp"
+            android:textSize="40dp"
             android:textColor="@color/red"
             android:layout_margin="5dp"
             android:background="@color/teal_200"
