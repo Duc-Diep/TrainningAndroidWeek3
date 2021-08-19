@@ -32,8 +32,6 @@ class MainActivity : AppCompatActivity() {
         handler = Handler(mainLooper)
         initThreadColor()
         initThread()
-
-
         //tăng giảm khi vuốt màn hình
         layout_number.setOnTouchListener { _, event ->
             when (event.action) {
@@ -61,17 +59,27 @@ class MainActivity : AppCompatActivity() {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 when (event?.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        synchronized(this){isRunning = false}
+                        synchronized(this) { isRunning = false }
                         if (mHandler != null) return true
-                        mHandler = Handler(Looper.myLooper()!!)
-                        btnPlus.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.green))
+                        mHandler = Handler(mainLooper)
+                        btnPlus.setBackgroundColor(
+                            ContextCompat.getColor(
+                                this@MainActivity,
+                                R.color.green
+                            )
+                        )
                         mAction.run()
                     }
                     MotionEvent.ACTION_UP -> {
                         if (mHandler == null) return true
                         mHandler?.removeCallbacks(mAction)
                         mHandler = null
-                        btnPlus.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.teal_200))
+                        btnPlus.setBackgroundColor(
+                            ContextCompat.getColor(
+                                this@MainActivity,
+                                R.color.teal_200
+                            )
+                        )
                         countToZero()
                     }
                     else -> return false
@@ -93,17 +101,27 @@ class MainActivity : AppCompatActivity() {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 when (event?.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        synchronized(this){isRunning = false}
+                        synchronized(this) { isRunning = false }
                         if (mHandler != null) return true
                         mHandler = Handler(mainLooper)
-                        btnSub.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.green))
+                        btnSub.setBackgroundColor(
+                            ContextCompat.getColor(
+                                this@MainActivity,
+                                R.color.green
+                            )
+                        )
                         mAction.run()
                     }
                     MotionEvent.ACTION_UP -> {
                         if (mHandler == null) return true
                         mHandler?.removeCallbacks(mAction)
                         mHandler = null
-                        btnSub.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.teal_200))
+                        btnSub.setBackgroundColor(
+                            ContextCompat.getColor(
+                                this@MainActivity,
+                                R.color.teal_200
+                            )
+                        )
                         countToZero()
                     }
                     else -> return false
@@ -122,9 +140,9 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun initThreadColor(){
+    private fun initThreadColor() {
         Thread {
-            while (true) {
+            while (count!=0) {
                 Thread.sleep(2000)
                 handler?.post {
                     randomColor()
@@ -155,20 +173,6 @@ class MainActivity : AppCompatActivity() {
                 Random.nextInt(0, 255)
             )
         )
-        btnPlus.setTextColor(
-            Color.rgb(
-                Random.nextInt(0, 255),
-                Random.nextInt(0, 255),
-                Random.nextInt(0, 255)
-            )
-        )
-        btnSub.setTextColor(
-            Color.rgb(
-                Random.nextInt(0, 255),
-                Random.nextInt(0, 255),
-                Random.nextInt(0, 255)
-            )
-        )
 
     }
 
@@ -193,11 +197,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
     private fun countToZero() {
-        synchronized(this){isRunning = true}
+        synchronized(this) { isRunning = true }
         count = tvNumber.text.toString().toInt()
         if (count != 0 && !thread?.isAlive!!) {
             initThread()
