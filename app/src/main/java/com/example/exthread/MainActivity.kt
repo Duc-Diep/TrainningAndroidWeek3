@@ -29,17 +29,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         handler = Handler(mainLooper)
+        initThreadColor()
         initThread()
-//        btnPlus.setOnClickListener {
-//            isRunning = false
-//            plus()
-//            countToZero()
-//        }
-//        btnSub.setOnClickListener {
-//            isRunning = false
-//            subtract()
-//            countToZero()
-//        }
+
 
         //tăng giảm khi vuốt màn hình
         layout_number.setOnTouchListener { _, event ->
@@ -68,10 +60,9 @@ class MainActivity : AppCompatActivity() {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 when (event?.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        isRunning = false
+                        synchronized(this){isRunning = false}
                         if (mHandler != null) return true
-                        mHandler = Handler(mainLooper)
-//                        mHandler?.postDelayed(mAction,200)
+                        mHandler = Handler(Looper.myLooper()!!)
                         mAction.run()
                     }
                     MotionEvent.ACTION_UP -> {
@@ -99,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 when (event?.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        isRunning = false
+                        synchronized(this){isRunning = false}
                         if (mHandler != null) return true
                         mHandler = Handler(mainLooper)
 //                        mHandler?.postDelayed(mAction,100)
@@ -125,6 +116,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    fun initThreadColor(){
+        Thread {
+            while (true) {
+                Thread.sleep(2000)
+                handler?.post {
+                    randomColor()
+                }
+            }
+        }.start()
     }
 
     fun plus() {
@@ -171,8 +173,10 @@ class MainActivity : AppCompatActivity() {
             override fun run() {
                 sleep(2500)
                 while (isRunning) {
+                    Log.d("Run", "run: threaddddddddd")
                     sleep(100)
                     if (count == 0) {
+                        handler?.removeCallbacksAndMessages(null)
                         return
                     }
                     if (count < 0)
@@ -185,20 +189,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        Thread {
-            while (true) {
-                Thread.sleep(2000)
-                handler?.post {
-                    randomColor()
-                }
-            }
-        }.start()
+
     }
 
     private fun countToZero() {
-        isRunning = true
+        synchronized(this){isRunning = true}
         count = tvNumber.text.toString().toInt()
         if (count != 0 && !thread?.isAlive!!) {
+            initThread()
             thread!!.start()
         }
 
