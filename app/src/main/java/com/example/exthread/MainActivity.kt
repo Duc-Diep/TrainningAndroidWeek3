@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.random.Random
@@ -63,12 +64,14 @@ class MainActivity : AppCompatActivity() {
                         synchronized(this){isRunning = false}
                         if (mHandler != null) return true
                         mHandler = Handler(Looper.myLooper()!!)
+                        btnPlus.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.green))
                         mAction.run()
                     }
                     MotionEvent.ACTION_UP -> {
                         if (mHandler == null) return true
                         mHandler?.removeCallbacks(mAction)
                         mHandler = null
+                        btnPlus.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.teal_200))
                         countToZero()
                     }
                     else -> return false
@@ -93,13 +96,14 @@ class MainActivity : AppCompatActivity() {
                         synchronized(this){isRunning = false}
                         if (mHandler != null) return true
                         mHandler = Handler(mainLooper)
-//                        mHandler?.postDelayed(mAction,100)
+                        btnSub.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.green))
                         mAction.run()
                     }
                     MotionEvent.ACTION_UP -> {
                         if (mHandler == null) return true
                         mHandler?.removeCallbacks(mAction)
                         mHandler = null
+                        btnSub.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.teal_200))
                         countToZero()
                     }
                     else -> return false
