@@ -142,15 +142,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun randomColor() {
-        if (count <= 100) {
-            tvNumber.setTextColor(
-                Color.rgb(
-                    Random.nextInt(0, 255),
-                    Random.nextInt(0, 255),
-                    Random.nextInt(0, 255)
-                )
+        tvNumber.setTextColor(
+            Color.rgb(
+                Random.nextInt(0, 255),
+                Random.nextInt(0, 255),
+                Random.nextInt(0, 255)
             )
-        }
+        )
+        btnPlus.setTextColor(
+            Color.rgb(
+                Random.nextInt(0, 255),
+                Random.nextInt(0, 255),
+                Random.nextInt(0, 255)
+            )
+        )
+        btnSub.setTextColor(
+            Color.rgb(
+                Random.nextInt(0, 255),
+                Random.nextInt(0, 255),
+                Random.nextInt(0, 255)
+            )
+        )
+
     }
 
     private fun initThread() {
@@ -172,6 +185,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        Thread {
+            while (true) {
+                Thread.sleep(2000)
+                handler?.post {
+                    randomColor()
+                }
+            }
+        }.start()
     }
 
     private fun countToZero() {
